@@ -38,7 +38,7 @@ version = '0.1.0'
 
 plugindev {
     pluginId 'io.github.guicamest.dexlazyloader'
-    pluginName 'Dex Lazy Loader plugin'
+    pluginName 'dexlazyloader'
     pluginImplementationClass 'io.github.guicamest.dexlazyloader.DYLPlugin'
     pluginDescription 'Gradle plugin to dex provided dependencies into your assets folder'
     pluginLicenses 'Apache-2.0'

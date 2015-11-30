@@ -83,7 +83,7 @@ install {
         pom {
             project {
                 packaging 'aar'
-                name 'DexLazyLoader library'
+                name 'Dex Lazy Loader library'
                 description 'Android library to load dexed jars on your assets folder on runtime'
                 url siteUrl
                 licenses {

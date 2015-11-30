@@ -9,7 +9,7 @@ set -ex
 REPO="git@github.com:guicamest/dexlazyloader.git"
 USER_ID="guicamest"
 GROUP_ID="io.github.guicamest.dexlazyloader"
-ARTIFACT_ID="dexlazyloader"
+ARTIFACT_ID="library"
 
 LATEST_VERSION=`curl "https://api.bintray.com/packages/guicamest/maven/dexlazyloader" | jq '.latest_version'`
 LATEST_VERSION="${LATEST_VERSION//\"/}"
@@ -19,11 +19,11 @@ LATEST_PLUGIN_VERSION="${LATEST_PLUGIN_VERSION//\"/}"
 
 GROUP_PATH="${GROUP_ID//\./\/}"
 
-sed -e "s/%VERSION%/'$LATEST_VERSION'/g" website/tpl/jquery-maven-artifact.min.js > website/static/jquery-maven-artifact.min.js
+sed -e "s/%LIBRARY_VERSION%/'$LATEST_VERSION'/g" website/tpl/jquery-maven-artifact.min.js > website/static/jquery-maven-artifact.min.js
+sed -i -e "s/%PLUGIN_VERSION%/'$LATEST_PLUGIN_VERSION'/g" website/static/jquery-maven-artifact.min.js
 
 curl -f -L -I "https://dl.bintray.com/$USER_ID/maven/$GROUP_PATH/$ARTIFACT_ID/$LATEST_VERSION/$ARTIFACT_ID-$LATEST_VERSION-javadoc.jar"
 
-exit
 DIR=temp-dexlazyloader-clone
 
 # Delete any existing temporary website clone
@@ -48,8 +48,8 @@ cp -R ../website/* .
 curl -L "https://dl.bintray.com/$USER_ID/maven/$GROUP_PATH/$ARTIFACT_ID/$LATEST_VERSION/$ARTIFACT_ID-$LATEST_VERSION-javadoc.jar" > javadoc.zip
 
 #unzip javadoc.zip -d javadoc
-winrar x javadoc.zip "groovydoc" -d .
-mv groovydoc javadoc
+mkdir javadoc
+winrar x javadoc.zip -d javadoc
 rm javadoc.zip
 
 # Stage all files in git and create a commit
