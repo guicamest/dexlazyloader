@@ -15,12 +15,3 @@ Sample
 
 You can find a sample application under the *sample* folder.
 
-Known Issues
-------------
-
-- Android Studio doesn't automatically rebuild if the dyl folder is modified (like it does with other resources). Therefore, if you add/remove jars to be dexed you will have to manually rebuild before they appear in assets folder.
-
-Planned Features
-----------------
-
-- Suggestions are welcome
