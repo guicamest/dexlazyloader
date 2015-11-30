@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Dex Lazy Loader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Android library and plugin to load dexed jars on runtime">
+    <link href="static/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="static/app.css" rel="stylesheet">
+    <link href="static/app-theme.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Roboto:400,300italic,100,100italic,300" rel="stylesheet" type="text/css">
+    <!--[if lt IE 9]><script src="static/html5shiv.min.js"></script><![endif]-->
+  </head>
+  <body data-target=".content-nav">
+    <header>
+      <div class="container">
+        <div class="row">
+          <div class="span5">
+            <h1>Dex Lazy Loader</h1>
+          </div>
+          <div class="span7">
+            <menu>
+              <ul>
+                <li><a href="#download" class="menu download">Download <span class="version-tag">Latest</span></a></li>
+                <li><a href="http://github.com/guicamest/dexlazyloader" data-title="View GitHub Project" class="menu github"><img src="static/icon-github.png" alt="GitHub"/></a></li>
+              </ul>
+            </menu>
+          </div>
+      </div>
+    </header>
+    <section id="subtitle">
+      <div class="container">
+        <div class="row">
+          <div class="span12">
+            <h2><strong>Android</strong> library and plugin to load <strong>dexed jars</strong> on runtime</h2>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="body">
+      <div class="container">
+        <div class="row">
+          <div class="span9">
+            <h3 id="introduction">Introduction</h3>
+
+			<p>Dex Lazy Loader (<strong>DYL</strong>) library and plugin were born as a result of reading
+			<a href="https://medium.com/@Macarse">Macarse</a>'s <strong>Lazy Loading Dex files</strong> 
+			<a href="https://medium.com/@Macarse/lazy-loading-dex-files-d41f6f37df0e">article</a>. If you
+			haven't read it yet, I strongly recommend you do before considering using <strong>DYL</strong>.
+			
+            <p>The library provides a <code>LazyLoader</code> to load dexed jars on runtime.</p>
+			<p>The plugin takes care of dexing <strong>provided</strong> dependencies and 
+			jars located at <strong>dyl</strong> folder into your assets folder.
+
+            <h3 id="using">Using Dex Lazy Loader</h3>
+            <p>We'll demonstrate Dex Lazy Loader using a basic sample based on
+			<strong>Macarse's</strong> <a href="https://github.com/Macarse/dexLazyLoad">dexLazyLoad sample</a>.
+			For the complete sample code that you can download, compile and run, see Dex Lazy Loader's
+			<a href="https://github.com/guicamest/dexlazyloader/tree/master/sample">sample</a>.</p>
+
+			<h4>Using dyl gradle plugin</h4>
+            <p>First, we apply the plugin and declare our provided dependencies:</p>
+			<pre class="prettyprint" id="buildgradle">
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'io.github.guicamest.dexlazyloader:plugin:<span class="plugin-version pln"><em>(insert latest version)</em></span>'
+    }
+}
+
+// Make sure to apply this plugin *after* the Android plugin
+apply plugin: 'io.github.guicamest.dexlazyloader'
+
+...
+
+dependencies {
+    compile 'io.github.guicamest.dexlazyloader:library:<span class="library-version pln"><em>(insert latest version)</em></span>'
+    provided 'com.squareup.picasso:picasso:2.5.2'
+}
+
+</pre>
+			<p>This will take provided dependencies and dex them into your assets folder.</p>
+			<p>If you want to use your own compiled version of that dependency, you can place
+			it under the <strong>dyl</strong> folder. For example:</p>
+			<pre class="prettyprint">
+src/
+    main/
+        assets/
+        java/
+        dyl/
+            picasso-2.5.2.jar
+</pre>
+			
+			<h4>Using dyl library</h4>
+			<p>Among the <a href="#buildgradle">declared dependencies</a>, we included the library:</p>
+			<pre class="prettyprint">dependencies {
+    ...
+    compile 'io.github.guicamest.dexlazyloader:library:<span class="library-version pln"><em>(insert latest version)</em></span>'
+    ...
+}
+</pre>
+			<p>With the library, we can use <code>LazyLoader</code>, <code>SimpleLazyLoadAsyncTask</code>
+			or <code>LazyLoadService</code> classes to load the dexed jars, generated in the previous step,
+			dinamically. In our MainActivity code we have a few examples:</p>
+			<pre class="prettyprint">protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        imageView = (ImageView) findViewById(R.id.image_view);
+
+        new SimpleLazyLoadAsyncTask<Void>(this){
+            @Override
+            protected void onPostExecute(Boolean success) {
+                super.onPostExecute(success);
+                if ( success ){
+                    final PicassoWrapper picassoWrapper = PicassoWrapper.get(mContext);
+                    Log.d("TAG", "loading image");
+                    picassoWrapper.load("http://i.imgur.com/CqmBjo5.jpg", imageView);
+                }
+            }
+        }.execute("picasso-2.5.2.dex.jar");
+    }
+
+    public void onLoadImageClick(View v) {
+        Log.d("TAG", "onLoadImageClick");
+
+        // TODO: Yes ,this should not be done in the main thread. Sorry Kittens.
+        LazyLoader.loadModulesWithContext(this, "picasso-2.5.2.dex.jar");
+        Log.d("TAG", "module loaded");
+
+        final PicassoWrapper picassoWrapper = PicassoWrapper.get(this);
+        Log.d("TAG", "loading image");
+        picassoWrapper.load("http://www.memecreator.org/static/images/memes/3767015.jpg", imageView);
+    }
+</pre>
+
+			<h4 id="download">Download</h4>
+			<p><a class="dl version-href">&darr; <span class="version-tag">v0.1.0</span> Library JAR</a></p>
+			
+			<h3 id="faq">FAQ</h3>
+			
+			<h4>Including/Excluding provided dependencies from dexing</h4>
+			<p>If you use provided dependencies that you don't want to dex to your assets folder,
+			you can configure the <code>dyl</code> extension either by inclusion or exclusion, or both:</p>
+<pre class="prettyprint">dyl {
+    exclude=['**/butter**']
+}
+</pre>
+		
+			<h4>Eclipse</h4>
+			<p>If you are using eclipse, DYL plugin hooks the <strong>eclipse</strong> gradle task.
+			So, basically, you need to run <code>./gradlew yourproject:eclipse</code> to generate
+			dexed jars based on your provided dependencies.</p>
+			
+			<h3 id="contributing">Contributing</h3>
+            <p>If you would like to contribute code you can do so through GitHub by forking the repository and sending a pull request.</p>
+            <p>When submitting code, please make every effort to follow existing conventions and style in order to keep the code as readable
+			as possible. Please also make sure your code compiles by running <code>gradle clean build</code>.</p>
+
+            <h3 id="license">License</h3>
+            <pre>Copyright 2015 guicamest
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</pre>
+          </div>
+          <div class="span3">
+            <div class="content-nav" data-spy="affix" data-offset-top="80">
+              <ul class="nav nav-tabs nav-stacked primary">
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#using">Using Dex Lazy Loader</a></li>
+				<li><a href="#download">Download</a></li>
+				<li><a href="#faq">FAQ</a></li>
+                <li><a href="#contributing">Contributing</a></li>
+                <li><a href="#license">License</a></li>
+              </ul>
+              <ul class="nav nav-pills nav-stacked secondary">
+                <li><a href="javadoc/index.html">Javadoc</a></li>
+                <li><a href="http://stackoverflow.com/questions/tagged/dexlazyloader?sort=active">StackOverflow</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+	<a href="https://github.com/guicamest/dexlazyloader"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:100;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="static/bootstrap.min.js"></script>
+    <script src="static/jquery.smooth-scroll.min.js"></script>
+    <script src="static/jquery-maven-artifact.min.js"></script>
+    <script src="static/prettify.js"></script>
+    <script type="text/javascript">
+      $(function() {
+        // Syntax highlight code blocks.
+        prettyPrint();
+
+        // Spy on scroll position for real-time updating of current section.
+        $('body').scrollspy();
+
+        // Use smooth-scroll for internal links.
+        $('a').smoothScroll();
+
+        // Enable tooltips on the header nav image items.
+        $('.menu').tooltip({
+          placement: 'bottom',
+          trigger: 'hover',
+          container: 'body',
+          delay: {
+            show: 500,
+            hide: 0
+          }
+        });
+
+        // Look up the latest version of the library.
+        $.fn.bintrayArtifactVersion('guicamest','io.github.guicamest.dexlazyloader','library',function(version, url) {
+          $('.version').text(version);
+          $('.version-tag').text('v' + version);
+		  $('.version-href').attr('href',url);
+		  $('.library-version').text(version);
+        });
+		// Look up the latest version of the plugin.
+        $.fn.bintrayArtifactVersion('guicamest','io.github.guicamest.dexlazyloader','plugin',function(version, url) {
+          $('.plugin-version').text(version);
+        });
+      });
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-64805378-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+  </body>
+</html>
