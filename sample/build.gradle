@@ -21,7 +21,7 @@ buildscript {
 
 
     dependencies {
-        classpath 'io.github.guicamest.dexlazyloader:plugin:0.1.0'
+ //       classpath 'io.github.guicamest.dexlazyloader:plugin:0.1.0'
     }
 
 }
@@ -29,7 +29,7 @@ apply plugin: 'eclipse'
 apply plugin: 'com.android.application'
 
 // Make sure to apply this plugin *after* the Android plugin
-apply plugin: 'io.github.guicamest.dexlazyloader'
+//apply plugin: 'io.github.guicamest.dexlazyloader'
 
 android {
     compileSdkVersion 21
@@ -62,6 +62,8 @@ dependencies {
     releaseProvided 'com.squareup.picasso:picasso:2.5.0'
 }
 
+/*
 dyl{
     exclude=['**/butter**']
 }
+*/
