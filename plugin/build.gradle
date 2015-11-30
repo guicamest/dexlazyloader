@@ -1,0 +1,69 @@
+/*
+ * Copyright 2015 guicamest
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+plugins {
+    id 'nu.studer.plugindev' version '1.0.4'
+}
+apply plugin: 'groovy'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}
+
+apply plugin: 'maven'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.11'
+}
+
+group = 'io.github.guicamest.dexlazyloader'
+version = '0.1.0'
+
+plugindev {
+    pluginId 'io.github.guicamest.dexlazyloader'
+    pluginName 'Dex Lazy Loader plugin'
+    pluginImplementationClass 'io.github.guicamest.dexlazyloader.DYLPlugin'
+    pluginDescription 'Gradle plugin to dex provided dependencies into your assets folder'
+    pluginLicenses 'Apache-2.0'
+    pluginTags 'gradle', 'plugin', 'android', 'dex', 'lazy', 'loader', 'jar'
+    authorId 'guicamest'
+    authorName 'Guillermo Campelo'
+    authorEmail 'guicamest@gmail.com'
+    projectUrl 'https://github.com/guicamest/dexlazyloader'
+    projectInceptionYear '2015'
+    done() // do not omit this
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    pkg.repo = 'maven'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            mavenLocal()
+        }
+    }
+}

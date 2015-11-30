@@ -1,0 +1,174 @@
+/*
+ * Copyright 2015 guicamest
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+repositories {
+    jcenter()
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_5
+        targetCompatibility JavaVersion.VERSION_1_5
+    }
+
+    defaultConfig {
+        minSdkVersion 4
+    }
+}
+
+dependencies {
+    testCompile 'junit:junit:4.11'
+}
+
+group = 'io.github.guicamest.dexlazyloader'
+version = '0.1.0'
+
+def siteUrl = 'http://guicamest.github.io/dexlazyloader/'
+def gitHomeUrl = 'https://github.com/guicamest/dexlazyloader'
+def gitUrl = 'https://github.com/guicamest/dexlazyloader.git'
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty('bintray.user')
+    key = properties.getProperty('bintray.apikey')
+
+    configurations = ['archives']
+    pkg{
+        repo = 'maven'
+        name = 'dexlazyloader'
+        licenses = ['Apache-2.0']
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name 'DexLazyLoader library'
+                description 'Android library to load dexed jars on your assets folder on runtime'
+                url siteUrl
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'guicamest'
+                        name 'Guillermo Campelo'
+                        email 'guicamest@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitHomeUrl
+                    url gitHomeUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+import groovy.io.FileType
+import java.util.regex.Pattern
+def copyAndRename = { File repoDir, File outputDir, File javaFile ->
+    if ( javaFile.name.toLowerCase().contains('application') ){
+        return
+    }
+    String originalPath = repoDir.toURI().relativize( javaFile.parentFile.toURI() ).toString()
+    String renamedPath = originalPath.replaceAll('support','dyl')
+    File repackagedDir = new File(outputDir, renamedPath)
+    repackagedDir.mkdirs()
+
+    String originalPackage = originalPath.replace('/' as char, '.' as char)[0..-2]
+    String renamedPackage = renamedPath.replace('/' as char, '.' as char)[0..-2]
+
+    String contents = javaFile.getText( 'UTF-8' )
+    new File(repackagedDir, javaFile.name) << contents.replaceAll(Pattern.quote(originalPackage), renamedPackage)
+        .replaceAll('private static void installSecondaryDexes','public static void installSecondaryDexes')
+        .replaceAll(Pattern.quote('{@link MultiDexApplication}'),'')
+        .replaceAll('@Override', '')
+}
+
+task('copyMultiDexFiles') << {
+    File repoDir = new File(temporaryDir, 'repo')
+    repoDir.deleteDir()
+    repoDir.mkdirs()
+
+    String multiDexRepo = 'https://android.googlesource.com/platform/frameworks/multidex/'
+    def cloneCmd = exec {
+        workingDir repoDir
+        commandLine 'git', 'clone', multiDexRepo
+    }
+
+    if ( cloneCmd.exitValue != 0 ){
+        logger.info("Git command failed with value ${cloneCmd.exitValue}")
+        return
+    }
+
+    File repoSourceDir = new File(repoDir, 'multidex/library/src')
+
+    File ourSourceDir = android.sourceSets.main.java.getSrcDirs().first()
+    File ourMultidexSourceDir = new File(ourSourceDir, 'android')
+    ourMultidexSourceDir.deleteDir()
+
+    def filterJavaFiles = ~/.*\.java$/
+    repoSourceDir.traverse type: FileType.FILES, visit: copyAndRename.curry(repoSourceDir, ourSourceDir), nameFilter: filterJavaFiles
+}
+

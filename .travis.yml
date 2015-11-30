@@ -1,0 +1,27 @@
+language: android
+
+android:
+  components:
+    - tools
+    - build-tools-23.0.2
+    - android-21
+    - extra-android-m2repository
+
+jdk: oraclejdk7
+
+notifications:
+  email: false
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.gradle
+
+before_install:
+ - chmod +x gradlew
+
+script:
+    - ./gradlew plugin:clean plugin:jar
+#    - ./gradlew library:clean library:build
+#    - ./gradlew sample:clean sample:assembleDebug

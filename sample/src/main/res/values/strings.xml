@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">DYL Sample</string>
+    <string name="load_image">Load other image</string>
+</resources>
