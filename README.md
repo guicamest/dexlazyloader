@@ -1,4 +1,4 @@
-Dex Lazy Loader (DYL)
+Dex Lazy Loader (DYL) [![Build Status](https://travis-ci.org/guicamest/dexlazyloader.svg?branch=master)](https://travis-ci.org/guicamest/dexlazyloader/branches) [ ![JCenter](https://api.bintray.com/packages/guicamest/maven/dexlazyloader/images/download.svg) ](https://bintray.com/guicamest/maven/dexlazyloader/\_latestVersion)
 ======
 
 *Call me when you need me! - Somebody*

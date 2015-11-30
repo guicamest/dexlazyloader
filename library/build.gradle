@@ -58,8 +58,11 @@ def siteUrl = 'http://guicamest.github.io/dexlazyloader/'
 def gitHomeUrl = 'https://github.com/guicamest/dexlazyloader'
 def gitUrl = 'https://github.com/guicamest/dexlazyloader.git'
 
+File props = project.rootProject.file('local.properties')
 Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+if ( props.exists() ){
+    properties.load(props.newDataInputStream())
+}
 
 bintray {
     user = properties.getProperty('bintray.user')
