@@ -62,8 +62,3 @@ dependencies {
     releaseProvided 'com.squareup.picasso:picasso:2.5.0'
 }
 
-/*
-dyl{
-    exclude=['**/butter**']
-}
-*/
