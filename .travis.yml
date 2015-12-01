@@ -25,4 +25,4 @@ before_install:
 script:
     - ./gradlew plugin:clean plugin:jar
     - ./gradlew library:clean library:build
-#    - ./gradlew sample:clean sample:assembleDebug
+    - ./gradlew sample:clean sample:assembleDebug
