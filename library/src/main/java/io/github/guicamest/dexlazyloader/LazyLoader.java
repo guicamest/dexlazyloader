@@ -126,7 +126,12 @@ public class LazyLoader {
                     return false;
                 }
             }
+            
+            if (!movedJars.contains(dexInternalStoragePath) && dexInternalStoragePath.exists()){
+                movedJars.add(dexInternalStoragePath);
+            }
         }
+            
         Log.d(TAG, "Done moving dexed jars to code cache dir. Took "+(System.currentTimeMillis() - startTime)+"ms");
         Log.d(TAG, "Installing dexed jars using cl with class "+cl.getClass());
 
