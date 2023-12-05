@@ -11,11 +11,13 @@ USER_ID="guicamest"
 GROUP_ID="io.github.guicamest.dexlazyloader"
 ARTIFACT_ID="library"
 
-LATEST_VERSION=`curl "https://api.bintray.com/packages/guicamest/maven/dexlazyloader" | jq '.latest_version'`
-LATEST_VERSION="${LATEST_VERSION//\"/}"
+#LATEST_VERSION=`curl "https://api.bintray.com/packages/guicamest/maven/dexlazyloader" | jq '.latest_version'`
+#LATEST_VERSION="${LATEST_VERSION//\"/}"
+LATEST_VERSION=0.1.0
 
-LATEST_PLUGIN_VERSION=`curl "https://api.bintray.com/packages/guicamest/maven/dexlazyloader" | jq '.latest_version'`
-LATEST_PLUGIN_VERSION="${LATEST_PLUGIN_VERSION//\"/}"
+#LATEST_PLUGIN_VERSION=`curl "https://api.bintray.com/packages/guicamest/maven/dexlazyloader" | jq '.latest_version'`
+#LATEST_PLUGIN_VERSION="${LATEST_PLUGIN_VERSION//\"/}"
+LATEST_PLUGIN_VERSION=0.1.0
 
 GROUP_PATH="${GROUP_ID//\./\/}"
 
